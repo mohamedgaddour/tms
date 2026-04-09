@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMS - Formulaire Logistique Transport</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap');
+        
+        :root {
+            --primary: #0ea5e9;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .form-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1);
+        }
+        
+        .section-header {
+            background: linear-gradient(90deg, #0ea5e9, #0284c8);
+            color: white;
+        }
+        
+        .dynamic-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .google-form-style input,
+        .google-form-style select,
+        .google-form-style textarea {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px 16px;
+            transition: border 0.2s;
+        }
+        
+        .google-form-style input:focus,
+        .google-form-style select:focus,
+        .google-form-style textarea:focus {
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+            outline: none;
+        }
+        
+        .add-btn {
+            transition: all 0.2s;
+        }
+        
+        .add-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.3);
+        }
+        
+        .package-card {
+            border-left: 5px solid #0ea5e9;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 py-8">
+    <div class="max-w-6xl mx-auto px-4">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center gap-x-3">
+                <div class="w-12 h-12 bg-sky-500 text-white rounded-2xl flex items-center justify-center text-3xl shadow-inner">
+                    🚚
+                </div>
+                <div>
+                    <h1 class="text-3xl font-semibold text-gray-900">TMS - Formulaire Logistique Transport</h1>
+                    <p class="text-sky-600 font-medium">Transport Management System • Connecté au portail web</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-x-4 text-sm">
+                <div class="flex items-center gap-x-2 bg-white px-4 py-2 rounded-2xl shadow-sm border border-gray-200">
+                    <i class="fa-solid fa-user text-emerald-500"></i>
+                    <span class="font-medium text-gray-700">Équipe Expéditeur • Tunis</span>
+                </div>
+                <div onclick="saveDraft()" class="flex items-center gap-x-2 px-5 py-2 bg-white hover:bg-gray-50 rounded-2xl border border-gray-300 cursor-pointer transition-colors">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span class="font-medium">Enregistrer brouillon</span>
+                </div>
+                <button onclick="generateDocuments()" 
+                        class="flex items-center gap-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-2xl font-semibold shadow-lg shadow-emerald-500/30 transition-all active:scale-95">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    <span>GÉNÉRER FACTURE + DOCUMENTS</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="form-container p-8 google-form-style">
+            
+            <!-- SECTION 1 : Informations Générales -->
+            <div class="section-header px-6 py-4 rounded-2xl mb-8 flex items-center justify-between">
+                <div class="flex items-center gap-x-3">
+                    <i class="fa-solid fa-circle-info text-2xl"></i>
+                    <h2 class="text-xl font-semibold">1. Informations Générales</h2>
+                </div>
+                <div class="text-xs bg-white/20 px-3 py-1 rounded-2xl flex items-center gap-x-1">
+                    <span id="current-date" class="font-mono"></span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6 mb-10">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nom de l'expéditeur / Société</label>
+                    <input id="shipper-name" type="text" value="Société Tunisienne de Transport" 
+                           class="w-full bg-white" placeholder="Nom complet">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Contact (téléphone + email)</label>
+                    <div class="flex gap-x-3">
+                        <input id="shipper-phone" type="tel" value="+216 71 234 567" class="w-1/2 bg-white">
+                        <input id="shipper-email" type="email" value="ops@stt.tn" class="w-1/2 bg-white">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Numéro de référence interne</label>
+                    <input id="ref-number" type="text" value="TMS-20260409-8742" 
+                           class="w-full bg-white font-mono">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Date du formulaire</label>
+                    <input id="form-date" type="date" class="w-full bg-white">
+                </div>
+            </div>
+
+            <!-- SECTION 2 : Type d'opération -->
+            <div class="section-header px-6 py-4 rounded-2xl mb-8 flex items-center gap-x-3">
+                <i class="fa-solid fa-arrow-right-arrow-left text-2xl"></i>
+                <h2 class="text-xl font-semibold">2. Type d'opération</h2>
+            </div>
+            
+            <div class="flex gap-x-8 mb-10">
+                <label onclick="selectOperation(this)" data-value="export" 
+                       class="operation-btn flex-1 cursor-pointer bg-white border-2 border-transparent hover:border-sky-200 rounded-3xl p-6 flex items-center gap-x-4 group active:scale-[0.98]">
+                    <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center text-4xl group-active:scale-110 transition-transform">📤</div>
+                    <div>
+                        <h3 class="font-semibold text-xl">Exportation</h3>
+                        <p class="text-gray-500 text-sm">Marchandise sort du pays</p>
+                    </div>
+                    <input type="radio" name="operation" value="export" class="ml-auto accent-sky-500 scale-150">
+                </label>
+                
+                <label onclick="selectOperation(this)" data-value="import" 
+                       class="operation-btn flex-1 cursor-pointer bg-white border-2 border-transparent hover:border-sky-200 rounded-3xl p-6 flex items-center gap-x-4 group active:scale-[0.98]">
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-4xl group-active:scale-110 transition-transform">📥</div>
+                    <div>
+                        <h3 class="font-semibold text-xl">Importation</h3>
+                        <p class="text-gray-500 text-sm">Marchandise entre dans le pays</p>
+                    </div>
+                    <input type="radio" name="operation" value="import" class="ml-auto accent-sky-500 scale-150">
+                </label>
+            </div>
+
+            <!-- SECTION 3 : Mode de transport -->
+            <div class="section-header px-6 py-4 rounded-2xl mb-8 flex items-center gap-x-3">
+                <i class="fa-solid fa-ship text-2xl"></i>
+                <h2 class="text-xl font-semibold">3. Mode de transport</h2>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-4 mb-10" id="transport-modes">
+                <!-- Dynamically populated by JS -->
+            </div>
+
+            <!-- Dynamic transport details (will be injected by JS) -->
+            <div id="transport-details" class="mb-10"></div>
+
+            <!-- SECTION 4 : Détails de la marchandise + Colis dynamiques -->
+            <div class="section-header px-6 py-4 rounded-2xl mb-8 flex items-center gap-x-3">
+                <i class="fa-solid fa-boxes-packing text-2xl"></i>
+                <h2 class="text-xl font-semibold">4. Détails de la marchandise &amp; Colis</h2>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Description de la marchandise</label>
+                    <textarea id="commodity-desc" rows="3" 
+                              class="w-full bg-white resize-y" placeholder="Ex: Pièces détachées automobiles, vêtements, produits frais..."></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Code HS</label>
+                        <input id="hs-code" type="text" class="w-full bg-white" placeholder="1234.56.78">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Incoterms</label>
+                        <select id="incoterms" class="w-full bg-white">
+                            <option value="EXW">EXW - Ex Works</option>
+                            <option value="FOB">FOB - Free On Board</option>
+                            <option value="CIF" selected>CIF - Cost, Insurance &amp; Freight</option>
+                            <option value="DAP">DAP - Delivered At Place</option>
+                            <option value="DDP">DDP - Delivered Duty Paid</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Poids total (kg)</label>
+                        <input id="total-weight" type="number" value="1250" class="w-full bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Volume total (m³)</label>
+                        <input id="total-volume" type="number" step="0.01" value="8.5" class="w-full bg-white">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Packages dynamic section -->
+            <div class="mb-4 flex items-center justify-between">
+                <h3 class="font-semibold text-lg flex items-center gap-x-2">
+                    <i class="fa-solid fa-box"></i> 
+                    Liste des colis
+                </h3>
+                <button onclick="addPackage()" 
+                        class="add-btn flex items-center gap-x-2 bg-sky-500 hover:bg-sky-600 text-white px-6 py-3 rounded-3xl font-medium">
+                    <i class="fa-solid fa-plus text-lg"></i>
+                    <span>Ajouter un colis</span>
+                </button>
+            </div>
+
+            <div id="packages-container" class="space-y-4 min-h-[100px]">
+                <!-- Dynamically added packages will appear here -->
+            </div>
+
+            <!-- SECTION 5 : Informations complémentaires -->
+            <div class="section-header px-6 py-4 rounded-2xl mb-8 flex items-center gap-x-3 mt-12">
+                <i class="fa-solid fa-circle-check text-2xl"></i>
+                <h2 class="text-xl font-semibold">5. Informations complémentaires</h2>
+            </div>
+
+            <div class="grid grid-cols-3 gap-6">
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Instructions spéciales / Remarques</label>
+                    <textarea id="special-instructions" rows="4" class="w-full bg-white" 
+                              placeholder="Ex: Température contrôlée +2°C à +8°C, marchandise fragile, douane prioritaire..."></textarea>
+                </div>
+                
+                <div>
+                    <div class="space-y-4">
+                        <label class="flex items-center gap-x-3 cursor-pointer">
+                            <input type="checkbox" id="dangerous-goods" class="w-5 h-5 accent-sky-500">
+                            <span class="font-medium">Marchandises dangereuses</span>
+                        </label>
+                        <label class="flex items-center gap-x-3 cursor-pointer">
+                            <input type="checkbox" id="temp-controlled" class="w-5 h-5 accent-sky-500">
+                            <span class="font-medium">Température contrôlée</span>
+                        </label>
+                        <label class="flex items-center gap-x-3 cursor-pointer">
+                            <input type="checkbox" id="insurance" class="w-5 h-5 accent-sky-500" checked>
+                            <span class="font-medium">Assurance transport requise</span>
+                        </label>
+                        
+                        <div class="pt-4 border-t">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Valeur marchandise (TND)</label>
+                            <input id="cargo-value" type="number" value="245000" class="w-full bg-white">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview area (appears after generation) -->
+            <div id="preview-section" class="hidden mt-12 border border-dashed border-emerald-300 bg-emerald-50/50 rounded-3xl p-8">
+                <h3 class="text-emerald-700 font-semibold text-xl mb-6 flex items-center gap-x-2">
+                    <i class="fa-solid fa-check-circle"></i>
+                    Facture &amp; Documents générés
+                </h3>
+                <div class="grid grid-cols-2 gap-8">
+                    <div id="invoice-preview" class="bg-white rounded-2xl p-6 shadow-sm"></div>
+                    <div id="transit-preview" class="space-y-6">
+                        <div class="bg-white rounded-2xl p-6 shadow-sm">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-xs text-gray-500">TEMPS DE TRANSIT ESTIMÉ</p>
+                                    <p id="transit-time-display" class="text-5xl font-semibold text-emerald-600 mt-1"></p>
+                                </div>
+                                <div class="text-7xl">⏳</div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-xs bg-white/70 p-4 rounded-2xl text-gray-600 leading-relaxed">
+                            Ce formulaire sera automatiquement envoyé au portail web clients.<br>
+                            Le client pourra suivre son colis en temps réel via le lien qui sera généré.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-x-3 mt-8">
+                    <button onclick="downloadJSON()" 
+                            class="flex-1 bg-white hover:bg-gray-50 border border-gray-300 py-4 rounded-3xl flex items-center justify-center gap-x-3 font-medium">
+                        <i class="fa-solid fa-download"></i>
+                        Télécharger JSON (pour intégration portail)
+                    </button>
+                    <button onclick="sendToPortal()" 
+                            class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-3xl flex items-center justify-center gap-x-3 font-medium">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        Envoyer immédiatement au portail web
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tailwind script already loaded
+        function initializeTailwind() {
+            // Already done via CDN
+        }
+        
+        // Current date
+        function setCurrentDate() {
+            const dateEl = document.getElementById('current-date')
+            const now = new Date()
+            const formatted = now.toLocaleDateString('fr-TN', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            })
+            dateEl.innerHTML = `📅 ${formatted} • ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`
+            
+            // Set default form date
+            const formDate = document.getElementById('form-date')
+            formDate.value = now.toISOString().split('T')[0]
+        }
+        
+        // Transport modes with icons
+        const transportModes = [
+            {
+                id: 'maritime',
+                label: 'Maritime',
+                icon: '🚢',
+                color: 'blue'
+            },
+            {
+                id: 'terrestre',
+                label: 'Terrestre',
+                icon: '🚚',
+                color: 'amber'
+            },
+            {
+                id: 'aerien',
+                label: 'Aérien',
+                icon: '✈️',
+                color: 'sky'
+            }
+        ]
+        
+        function renderTransportModes() {
+            const container = document.getElementById('transport-modes')
+            container.innerHTML = ''
+            
+            transportModes.forEach(mode => {
+                const div = document.createElement('div')
+                div.className = `transport-mode-card cursor-pointer bg-white border-2 border-transparent hover:border-${mode.color}-300 rounded-3xl p-6 text-center transition-all active:scale-95`
+                div.innerHTML = `
+                    <div onclick="selectTransportMode('${mode.id}', this)" class="flex flex-col items-center gap-y-3">
+                        <div class="text-6xl">${mode.icon}</div>
+                        <h3 class="font-semibold text-2xl">${mode.label}</h3>
+                        <input type="radio" name="transport-mode" value="${mode.id}" class="hidden">
+                    </div>
+                `
+                container.appendChild(div)
+            })
+        }
+        
+        let selectedMode = null
+        
+        function selectTransportMode(modeId, element) {
+            // Deselect all
+            document.querySelectorAll('.transport-mode-card').forEach(el => {
+                el.classList.remove('border-sky-500', 'shadow-xl')
+                el.classList.add('border-transparent')
+            })
+            
+            // Select this one
+            element.classList.add('border-sky-500', 'shadow-xl')
+            
+            selectedMode = modeId
+            renderTransportDetails(modeId)
+        }
+        
+        function renderTransportDetails(mode) {
+            const container = document.getElementById('transport-details')
+            
+            let html = `<div class="bg-white border border-gray-200 rounded-3xl p-8">`
+            
+            if (mode === 'maritime') {
+                html += `
+                <h3 class="font-semibold mb-6 flex items-center gap-x-2 text-lg"><i class="fa-solid fa-ship"></i> Détails Maritime</h3>
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Port de chargement</label>
+                        <input id="port-loading" type="text" value="Port de Tunis - Tunisie" class="w-full">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Port de déchargement</label>
+                        <input id="port-discharge" type="text" value="Port de Marseille - France" class="w-full">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nom du navire (optionnel)</label>
+                        <input id="vessel-name" type="text" placeholder="MSC EVA" class="w-full">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Type de conteneur</label>
+                        <select id="container-type" class="w-full">
+                            <option value="20ft">20ft Dry Container</option>
+                            <option value="40ft" selected>40ft Dry Container</option>
+                            <option value="40hc">40ft High Cube</option>
+                            <option value="reefer">Reefer Container</option>
+                        </select>
+                    </div>
+                </div>`
+            } 
+            else if (mode === 'aerien') {
+                html += `
+                <h3 class="font-semibold mb-6 flex items-center gap-x-2 text-lg"><i class="fa-solid fa-plane"></i> Détails Aérien</h3>
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Aéroport de départ</label>
+                        <input id="airport-origin" type="text" value="Aéroport de Tunis-Carthage (TUN)" class="w-full">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Aéroport d'arrivée</label>
+                        <input id="airport-dest" type="text" value="Aéroport Charles de Gaulle (CDG)" class="w-full">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Numéro de vol (si connu)</label>
+                        <input id="flight-number" type="text" placeholder="AF 1234" class="w-full">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Type de fret</label>
+                        <select id="air-cargo-type" class="w-full">
+                            <option value="general">Fret Général</option>
+                            <option value="express">Express / Priority</option>
+                            <option value="perishable">Périssable</option>
+                        </select>
+                    </div>
+                </div>`
+            } 
+            else if (mode === 'terrestre') {
+                html += `
+                <h3 class="font-semibold mb-6 flex items-center gap-x-2 text-lg"><i class="fa-solid fa-truck"></i> Détails Terrestre</h3>
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Lieu de prise en charge</label>
+                        <input id="pickup-city" type="text" value="Tunis, Tunisie" class="w-full">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Lieu de livraison</label>
+                        <input id="delivery-city" type="text" value="Sfax, Tunisie" class="w-full">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Type de véhicule</label>
+                        <select id="truck-type" class="w-full">
+                            <option value="camion">Camion 20T</option>
+                            <option value="remorque" selected>Remorque 40T</option>
+                            <option value="fourgon">Fourgonnette</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Kilométrage estimé (km)</label>
+                        <input id="distance-km" type="number" value="320" class="w-full">
+                    </div>
+                </div>`
+            }
+            
+            html += `</div>`
+            container.innerHTML = html
+        }
+        
+        // Packages management
+        let packages = []
+        
+        function addPackage() {
+            const newPackage = {
+                id: Date.now(),
+                type: 'Carton',
+                length: 120,
+                width: 80,
+                height: 60,
+                weight: 25,
+                description: ''
+            }
+            packages.push(newPackage)
+            renderPackages()
+        }
+        
+        function removePackage(id) {
+            packages = packages.filter(p => p.id !== id)
+            renderPackages()
+        }
+        
+        function renderPackages() {
+            const container = document.getElementById('packages-container')
+            container.innerHTML = ''
+            
+            if (packages.length === 0) {
+                container.innerHTML = `
+                <div class="border border-dashed border-gray-300 rounded-3xl py-12 text-center text-gray-400">
+                    <i class="fa-solid fa-boxes-packing text-4xl mb-3"></i>
+                    <p>Aucun colis ajouté pour le moment</p>
+                    <p class="text-xs mt-1">Cliquez sur "Ajouter un colis" ci-dessus</p>
+                </div>`
+                return
+            }
+            
+            packages.forEach((pkg, index) => {
+                const card = document.createElement('div')
+                card.className = `package-card bg-white rounded-3xl p-5 grid grid-cols-12 gap-4 items-end dynamic-item`
+                card.innerHTML = `
+                    <div class="col-span-2">
+                        <label class="text-xs font-medium text-gray-500 block mb-1">Type</label>
+                        <select onchange="updatePackage(${pkg.id}, 'type', this.value)" class="w-full text-sm">
+                            <option value="Carton" ${pkg.type === 'Carton' ? 'selected' : ''}>Carton</option>
+                            <option value="Palette" ${pkg.type === 'Palette' ? 'selected' : ''}>Palette</option>
+                            <option value="Caisse" ${pkg.type === 'Caisse' ? 'selected' : ''}>Caisse</option>
+                            <option value="Sac" ${pkg.type === 'Sac' ? 'selected' : ''}>Sac</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="text-xs font-medium text-gray-500 block mb-1">Long. (cm)</label>
+                        <input type="number" value="${pkg.length}" 
+                               onchange="updatePackage(${pkg.id}, 'length', this.value)" 
+                               class="w-full text-sm">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="text-xs font-medium text-gray-500 block mb-1">Larg. (cm)</label>
+                        <input type="number" value="${pkg.width}" 
+                               onchange="updatePackage(${pkg.id}, 'width', this.value)" 
+                               class="w-full text-sm">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="text-xs font-medium text-gray-500 block mb-1">Haut. (cm)</label>
+                        <input type="number" value="${pkg.height}" 
+                               onchange="updatePackage(${pkg.id}, 'height', this.value)" 
+                               class="w-full text-sm">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="text-xs font-medium text-gray-500 block mb-1">Poids (kg)</label>
+                        <input type="number" value="${pkg.weight}" 
+                               onchange="updatePackage(${pkg.id}, 'weight', this.value)" 
+                               class="w-full text-sm">
+                    </div>
+                    <div class="col-span-2 flex items-end justify-end">
+                        <button onclick="removePackage(${pkg.id})" 
+                                class="text-red-500 hover:text-red-700 px-4 py-3">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="col-span-12 mt-3">
+                        <input type="text" value="${pkg.description}" placeholder="Description du colis" 
+                               onchange="updatePackage(${pkg.id}, 'description', this.value)" 
+                               class="w-full text-sm border border-gray-200 focus:border-sky-400">
+                    </div>
+                `
+                container.appendChild(card)
+            })
+        }
+        
+        function updatePackage(id, field, value) {
+            const pkg = packages.find(p => p.id === id)
+            if (pkg) {
+                if (field === 'length' || field === 'width' || field === 'height' || field === 'weight') {
+                    pkg[field] = parseFloat(value) || 0
+                } else {
+                    pkg[field] = value
+                }
+            }
+        }
+        
+        // Operation type selection
+        function selectOperation(el) {
+            document.querySelectorAll('.operation-btn').forEach(e => {
+                e.classList.remove('border-emerald-400', 'shadow-lg')
+            })
+            el.classList.add('border-emerald-400', 'shadow-lg')
+        }
+        
+        // Generate full documents
+        function generateDocuments() {
+            // Collect all data
+            const formData = {
+                timestamp: new Date().toISOString(),
+                operation: document.querySelector('input[name="operation"]:checked') ? 
+                           document.querySelector('input[name="operation"]:checked').value : 'export',
+                mode: selectedMode || 'maritime',
+                shipper: {
+                    name: document.getElementById('shipper-name').value,
+                    phone: document.getElementById('shipper-phone').value,
+                    email: document.getElementById('shipper-email').value
+                },
+                reference: document.getElementById('ref-number').value,
+                commodity: document.getElementById('commodity-desc').value,
+                hsCode: document.getElementById('hs-code').value,
+                totalWeight: parseFloat(document.getElementById('total-weight').value),
+                totalVolume: parseFloat(document.getElementById('total-volume').value),
+                incoterms: document.getElementById('incoterms').value,
+                cargoValue: parseFloat(document.getElementById('cargo-value').value),
+                packages: [...packages],
+                specialInstructions: document.getElementById('special-instructions').value,
+                dangerousGoods: document.getElementById('dangerous-goods').checked,
+                tempControlled: document.getElementById('temp-controlled').checked,
+                insurance: document.getElementById('insurance').checked
+            }
+            
+            // Add transport-specific data
+            if (selectedMode === 'maritime') {
+                formData.transportDetails = {
+                    portLoading: document.getElementById('port-loading').value,
+                    portDischarge: document.getElementById('port-discharge').value,
+                    vessel: document.getElementById('vessel-name').value,
+                    containerType: document.getElementById('container-type').value
+                }
+            } else if (selectedMode === 'aerien') {
+                formData.transportDetails = {
+                    airportOrigin: document.getElementById('airport-origin').value,
+                    airportDest: document.getElementById('airport-dest').value,
+                    flight: document.getElementById('flight-number').value
+                }
+            } else if (selectedMode === 'terrestre') {
+                formData.transportDetails = {
+                    pickup: document.getElementById('pickup-city').value,
+                    delivery: document.getElementById('delivery-city').value,
+                    truckType: document.getElementById('truck-type').value,
+                    distance: document.getElementById('distance-km').value
+                }
+            }
+            
+            // Generate invoice number
+            const invoiceNumber = `INV-TMS-${new Date().getFullYear()}${(new Date().getMonth()+1).toString().padStart(2,'0')}${new Date().getDate().toString().padStart(2,'0')}-${Math.floor(10000 + Math.random() * 90000)}`
+            
+            // Simple transit time estimation (realistic for Tunisia routes)
+            let transitTime = ''
+            if (selectedMode === 'maritime') transitTime = '18 à 35 jours'
+            else if (selectedMode === 'aerien') transitTime = '2 à 6 jours'
+            else if (selectedMode === 'terrestre') transitTime = '1 à 4 jours'
+            
+            // Render preview
+            const preview = document.getElementById('preview-section')
+            preview.classList.remove('hidden')
+            preview.scrollIntoView({ behavior: 'smooth' })
+            
+            // Invoice card
+            document.getElementById('invoice-preview').innerHTML = `
+                <div class="flex justify-between mb-6">
+                    <div>
+                        <div class="uppercase text-xs tracking-[1px] text-emerald-600 font-semibold">FACTURE TRANSPORT</div>
+                        <div class="text-3xl font-bold text-gray-800">${invoiceNumber}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-emerald-500 text-5xl">📄</div>
+                    </div>
+                </div>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between"><span class="text-gray-500">Client / Expéditeur</span><span class="font-medium">${formData.shipper.name}</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Référence</span><span class="font-medium">${formData.reference}</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Mode</span><span class="font-medium capitalize">${selectedMode || '—'}</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Marchandise</span><span class="font-medium">${formData.commodity.substring(0, 45)}...</span></div>
+                    <div class="flex justify-between border-t pt-3"><span class="font-semibold">Valeur marchandise</span><span class="font-semibold">${formData.cargoValue.toLocaleString('fr-TN')} TND</span></div>
+                    <div class="flex justify-between"><span class="font-semibold">Poids total</span><span class="font-semibold">${formData.totalWeight} kg</span></div>
+                </div>
+                <div class="mt-8 text-xs text-emerald-700 flex items-center gap-x-2">
+                    <i class="fa-solid fa-circle-check"></i>
+                    Facture prête à être intégrée dans le SAS (Proforma + Disbursement)
+                </div>`
+            
+            // Transit display
+            document.getElementById('transit-time-display').innerHTML = `
+                ${transitTime}<br>
+                <span class="text-base font-normal text-gray-500">Tunis → Destination</span>`
+            
+            // Save to localStorage (for persistence in local app)
+            localStorage.setItem('lastTMSForm', JSON.stringify(formData))
+            
+            console.log('%c✅ Formulaire TMS complet généré', 'color:#0ea5e9; font-weight:700', formData)
+        }
+        
+        function downloadJSON() {
+            const saved = localStorage.getItem('lastTMSForm')
+            if (!saved) return alert('Aucun formulaire à télécharger')
+            
+            const blob = new Blob([saved], { type: 'application/json' })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = `TMS-Formulaire-${new Date().toISOString().slice(0,10)}.json`
+            a.click()
+            URL.revokeObjectURL(url)
+        }
+        
+        function sendToPortal() {
+            const saved = localStorage.getItem('lastTMSForm')
+            if (!saved) return
+            
+            // Simulate sending to web portal
+            alert('🚀 Formulaire envoyé avec succès vers le portail web clients !\n\nLe client peut maintenant suivre son colis et valider l’offre.')
+            
+            // In real integration, you would POST this JSON to your web portal API
+            console.log('📤 Envoi vers portail web :', JSON.parse(saved))
+            
+            // Optional: reset form after send
+            if (confirm('Voulez-vous réinitialiser le formulaire pour un nouveau transport ?')) {
+                location.reload()
+            }
+        }
+        
+        function saveDraft() {
+            const draftData = {
+                shipperName: document.getElementById('shipper-name').value,
+                // ... you can extend this
+                packages: packages
+            }
+            localStorage.setItem('tmsDraft', JSON.stringify(draftData))
+            alert('✅ Brouillon sauvegardé localement')
+        }
+        
+        // Initialize everything
+        window.onload = function() {
+            setCurrentDate()
+            renderTransportModes()
+            renderPackages() // empty at start
+            
+            // Load last draft if exists
+            const draft = localStorage.getItem('tmsDraft')
+            if (draft) {
+                console.log('📝 Brouillon précédent chargé')
+            }
+            
+            console.log('%c🚚 Formulaire TMS Python-style (HTML/JS) prêt !', 'background:#0ea5e9;color:white;padding:2px 6px;border-radius:4px')
+            console.log('Ce code est une version autonome, très proche de Google Forms, avec icônes + dynamiques. Tu peux l’intégrer dans ton application locale (fichier .html) ou le convertir en Streamlit/Flask plus tard.')
+        }
+    </script>
+</body>
+</html>
